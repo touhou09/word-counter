@@ -33,14 +33,11 @@ words = rdd.flatMap(lambda line: line.split())
 # 단어를 DataFrame으로 변환
 df = words.map(lambda word: (word, )).toDF(["word"])
 
-# 단어 갯수 세기
-word_counts = df.groupBy("word").count()
+# 단어 갯수 세기 및 단어 갯수 순으로 정렬
+word_counts = df.groupBy("word").count().orderBy(col("count").desc(), col("word"))
 
-# 결과를 CSV로 저장
-word_counts.write.mode("overwrite").csv("/data/word_counts.csv", header=True)
-
-# 결과를 JSON으로 저장
-word_counts.write.mode("overwrite").json("/data/word_counts.json")
+# 모든 결과값 출력
+word_counts.show(truncate=False, n=word_counts.count())
 
 # 세션 종료
 spark.stop()
